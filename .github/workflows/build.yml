@@ -1,0 +1,61 @@
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    env:
+      # Linux: let Conan install the X11/Wayland development packages SDL needs.
+      CONAN_ARGS: >-
+        -s compiler.cppstd=17
+        -c tools.system.package_manager:mode=install
+        -c tools.system.package_manager:sudo=True
+      # Commit of yazilimperver/sdl-painter whose Conan Center recipe builds 1.4.0.
+      SDL_PAINTER_RECIPE_REF: bf20fc28ae8dc6cb7e226cd8f313cd5e5c187f6c
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install Conan
+        run: |
+          pip install "conan>=2.0,<3"
+          conan profile detect --force
+
+      - name: Cache Conan packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.conan2/p
+          key: conan-${{ matrix.os }}-${{ env.SDL_PAINTER_RECIPE_REF }}-${{ hashFiles('conanfile.txt') }}
+          restore-keys: |
+            conan-${{ matrix.os }}-
+
+      # sdl_painter is not on Conan Center yet. Until it is, build the package
+      # from the recipe submitted there; then delete this step.
+      - name: Create sdl_painter package
+        shell: bash
+        run: |
+          git clone -q --filter=blob:none https://github.com/yazilimperver/sdl-painter.git "$RUNNER_TEMP/sdl-painter"
+          git -C "$RUNNER_TEMP/sdl-painter" checkout -q "$SDL_PAINTER_RECIPE_REF"
+          conan create "$RUNNER_TEMP/sdl-painter/packaging/conan-center/all" --version=1.4.0 --build=missing $CONAN_ARGS
+
+      - name: Install dependencies
+        shell: bash
+        run: conan install . --build=missing $CONAN_ARGS
+
+      - name: Configure
+        run: cmake --preset ${{ runner.os == 'Windows' && 'conan-default' || 'conan-release' }}
+
+      - name: Build
+        run: cmake --build --preset conan-release
