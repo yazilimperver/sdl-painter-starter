@@ -12,7 +12,7 @@ You get a window with a rotating card and a dot that follows the mouse; press
 |---|---|
 | `src/main.cpp` | The application: an `sdl_painter::Application` subclass |
 | `CMakeLists.txt` | `find_package(sdl_painter)`, warnings, DLL copy on Windows |
-| `conanfile.txt` | Requires `sdl_painter/1.4.0` |
+| `conanfile.txt` | Requires `sdl_painter/1.5.1` |
 | `.github/workflows/build.yml` | Builds on Linux and Windows |
 
 ## Requirements
@@ -32,8 +32,8 @@ recipe that was submitted there:
 ```bash
 git clone https://github.com/yazilimperver/sdl-painter.git
 cd sdl-painter
-git checkout bf20fc28ae8dc6cb7e226cd8f313cd5e5c187f6c
-conan create packaging/conan-center/all --version=1.4.0 --build=missing -s compiler.cppstd=17
+git checkout bf253b806aa399d3d3213fc6ced3350b8221e962
+conan create packaging/conan-center/all --version=1.5.1 --build=missing -s compiler.cppstd=17
 ```
 
 After the merge this step goes away; `conan install` below fetches the package.

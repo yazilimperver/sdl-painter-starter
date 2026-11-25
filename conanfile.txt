@@ -1,5 +1,5 @@
 [requires]
-sdl_painter/1.4.0
+sdl_painter/1.5.1
 
 [generators]
 CMakeDeps

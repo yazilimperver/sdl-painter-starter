@@ -19,8 +19,8 @@ jobs:
         -s compiler.cppstd=17
         -c tools.system.package_manager:mode=install
         -c tools.system.package_manager:sudo=True
-      # Commit of yazilimperver/sdl-painter whose Conan Center recipe builds 1.4.0.
-      SDL_PAINTER_RECIPE_REF: bf20fc28ae8dc6cb7e226cd8f313cd5e5c187f6c
+      # Commit of yazilimperver/sdl-painter whose Conan Center recipe builds 1.5.1.
+      SDL_PAINTER_RECIPE_REF: bf253b806aa399d3d3213fc6ced3350b8221e962
     steps:
       - uses: actions/checkout@v7
 
@@ -48,7 +48,7 @@ jobs:
         run: |
           git clone -q --filter=blob:none https://github.com/yazilimperver/sdl-painter.git "$RUNNER_TEMP/sdl-painter"
           git -C "$RUNNER_TEMP/sdl-painter" checkout -q "$SDL_PAINTER_RECIPE_REF"
-          conan create "$RUNNER_TEMP/sdl-painter/packaging/conan-center/all" --version=1.4.0 --build=missing $CONAN_ARGS
+          conan create "$RUNNER_TEMP/sdl-painter/packaging/conan-center/all" --version=1.5.1 --build=missing $CONAN_ARGS
 
       - name: Install dependencies
         shell: bash
